@@ -1,0 +1,9 @@
+[04-Oct-2015 07:32:57 Etc/GMT] PHP Notice:  Undefined index: name in /home/hartleyl/public_html/chougule.me/process.php on line 6
+[04-Oct-2015 07:32:57 Etc/GMT] PHP Notice:  Undefined index: name in /home/hartleyl/public_html/chougule.me/process.php on line 6
+[04-Oct-2015 07:32:57 Etc/GMT] PHP Notice:  Undefined index: email in /home/hartleyl/public_html/chougule.me/process.php on line 7
+[04-Oct-2015 07:32:57 Etc/GMT] PHP Notice:  Undefined index: email in /home/hartleyl/public_html/chougule.me/process.php on line 7
+[04-Oct-2015 07:32:57 Etc/GMT] PHP Notice:  Undefined index: website in /home/hartleyl/public_html/chougule.me/process.php on line 8
+[04-Oct-2015 07:32:57 Etc/GMT] PHP Notice:  Undefined index: website in /home/hartleyl/public_html/chougule.me/process.php on line 8
+[04-Oct-2015 07:32:57 Etc/GMT] PHP Notice:  Undefined index: comment in /home/hartleyl/public_html/chougule.me/process.php on line 9
+[04-Oct-2015 07:32:57 Etc/GMT] PHP Notice:  Undefined index: comment in /home/hartleyl/public_html/chougule.me/process.php on line 9
+[04-Oct-2015 07:32:57 Etc/GMT] PHP Notice:  Undefined variable: errors in /home/hartleyl/public_html/chougule.me/process.php on line 15

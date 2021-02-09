@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Places from Foursquare</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+<link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.css' rel='stylesheet' />
+
+<style>
+  body { margin:0; padding:0; }
+  #map { position:absolute; top:0; bottom:0; width:100%; }
+  #search {
+    position: absolute;
+    z-index: 999;
+    left: 50px;
+    top: 8px;
+    width: 600px;
+  }
+  #search input {
+    padding: 5px;
+    border: 1px solid #666;
+    -moz-box-shadow:    2px 2px 1px #999;
+    -webkit-box-shadow: 2px 2px 1px #999;
+    box-shadow:         2px 2px 1px #999;
+  }
+  #search button {
+    padding: 4px 10px;
+    -moz-box-shadow:    2px 2px 1px #999;
+    -webkit-box-shadow: 2px 2px 1px #999;
+    box-shadow:         2px 2px 1px #999;
+  }
+  @media only screen and (max-width: 479px) {
+    #search {
+      width: 350px;
+    }
+    #search input {
+      width: 90px;
+    }
+  }
+</style>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.4/mapbox.js'></script>
+
+
+</head>
+<body>
+
+<div id="search">
+  <form name="searchForm" id="searchForm" method="post" class="form-inline">
+      <input type="text" class="form-control" id="term" placeholder="eg. Cafe, Bar">
+      <input type="text" class="form-control" id="radius" placeholder="Radius (eg. 1500">
+      <button type="submit" id="btnFind" class="btn btn-primary">Find</button>
+  </form>
+</div>
+
+<div id='map' class="dark"></div>
+
+<script type="text/javascript">
+
+  //global variables
+  var CLIENT_ID = 'JOR0QOJUGJNZJAUSS3AP3FFOKB2FTZ4WWPJET0RUNMYX3DPK';
+  var CLIENT_SECRET = 'WMZI5O3ANEGWD1DWQQAYEZ3KLEFOGF5L4IJZOIWAHIASFKW0';
+  var query = 'Cafe';
+  var radius = '1500';
+  var lat = '18.5154235';
+  var lon = '73.7789197';
+
+  $(function(){
+
+      var watchProcess = null;
+      var foursquarePlaces;
+      
+      watchProcess = navigator.geolocation.watchPosition(handle_geolocation_query, handle_errors);
+
+      function handle_errors(error){
+        switch(error.code)
+        {
+          case error.PERMISSION_DENIED: alert("user did not share Geolocation data");
+          break;
+
+          case error.POSITION_UNAVAILABLE: alert("could not detect current position");
+          break;
+
+          case error.TIMEOUT: alert("retrieving position timedout");
+          break;
+
+          default: alert("unknown error");
+          break;  
+        }
+      }
+      
+      function handle_geolocation_query(position) {
+        lat = position.coords.latitude;
+        lon = position.coords.longitude;
+
+        //set map based on geoLocation
+        setMap();
+      }
+
+
+      function setMap(){        
+        var map = L.mapbox.map('map', 'rohan591.inkcbc1g').setView([lat, lon], 15);
+
+        // Credit Foursquare for their wonderful data
+        map.attributionControl.addAttribution('<span>Places data from Foursquare, integrated by <a target="_blank" href="http://www.chougule.me">Rohan Chougule</a></span>');
+
+        foursquarePlaces = L.layerGroup().addTo(map);
+      }
+
+
+
+      // Use jQuery to make an AJAX request to Foursquare to load markers data.
+
+      $('#searchForm').submit(function(e){
+          e.preventDefault();
+
+          $('#btnFind').text('Finding...');
+
+          query = $('#term').val();
+          radius = $('#radius').val();
+          
+          getPlaces();
+
+      });
+
+      function getPlaces(){
+
+          foursquarePlaces.clearLayers();
+
+        // https://developer.foursquare.com/start/search
+        var API_ENDPOINT = 'https://api.foursquare.com/v2/venues/search' +
+          '?client_id='+CLIENT_ID +
+          '&client_secret='+CLIENT_SECRET +
+          '&v=20130815' +
+          '&ll=' + lat + ',' + lon +
+          '&query=' + query +
+          '&radius=' + radius +
+          '&callback=?';
+
+        $.getJSON(API_ENDPOINT
+            .replace('CLIENT_ID', CLIENT_ID)
+            .replace('CLIENT_SECRET', CLIENT_SECRET)
+            .replace('LATLON', lat +
+                ',' + lon), function(result, status) {
+
+                if (status !== 'success') return alert('Request to Foursquare failed');
+
+                // Transform each venue result into a marker on the map.
+                for (var i = 0; i < result.response.venues.length; i++) {
+                  var venue = result.response.venues[i];
+                  var latlng = L.latLng(venue.location.lat, venue.location.lng);
+                  if (venue.location.address && venue.location.address != 'undefined'){
+                    var address = venue.location.address;
+                  }else{
+                    var address = '';
+                  };
+                  var marker = L.marker(latlng, {
+                      icon: L.mapbox.marker.icon({
+                        'marker-color': '#63b6e5',
+                        'marker-symbol': query,
+                        'marker-size': 'large'
+                      })
+                   })
+                  .bindPopup('<a class="pinTitle" href="https://foursquare.com/v/' + venue.id + '" target="_blank"><strong>' +
+                    venue.name + '</strong></a><br><em>'+address+'</em>')
+                    .addTo(foursquarePlaces);
+                }
+
+                $('#btnFind').text('Find');
+
+        });
+      }
+
+
+  });
+</script>
+
+</body>
+</html>
